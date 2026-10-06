@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Don Bosco Zesde Leerjaar - Begrijpend Lezen & Informatieve Teksten</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Quicksand:wght@500;600;700&family=Merriweather:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        dbBlue: '#1e3a8a',
+                        dbTeal: '#0d9488',
+                        dbOrange: '#f59e0b',
+                        dbLightBg: '#f8fafc',
+                    },
+                    fontFamily: {
+                        sans: ['Quicksand', 'sans-serif'],
+                        display: ['Fredoka', 'sans-serif'],
+                        serif: ['Merriweather', 'serif'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        @media print {
+            body {
+                background: white !important;
+                color: black !important;
+                font-size: 10pt;
+            }
+            .no-print {
+                display: none !important;
+            }
+            .print-only {
+                display: block !important;
+            }
+            .page-break {
+                page-break-before: always;
+            }
+            .print-card {
+                border: none !important;
+                box-shadow: none !important;
+                padding: 0 !important;
+                margin: 0 !important;
+            }
+            .print-text-column {
+                font-size: 10pt !important;
+                line-height: 1.5 !important;
+            }
+            /* Notebook style writing lines for print */
+            .writing-line {
+                border-bottom: 1px solid #94a3b8 !important;
+                height: 22px !important;
+                width: 100% !important;
+            }
+        }
+
+        .print-only {
+            display: none;
+        }
+
+        /* Screen writing line style */
+        .writing-line {
+            border-bottom: 1px dashed #cbd5e1;
+            height: 24px;
+            width: 100%;
+        }
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+    </style>
+</head>
+<body class="bg-dbLightBg text-slate-800 min-h-screen flex flex-col font-sans selection:bg-dbTeal selection:text-white">
+
+    <header class="bg-dbBlue text-white shadow-md no-print border-b-4 border-dbTeal">
+        <div class="max-w-7xl mx-auto px-4 py-4 flex flex-col md:flex-row justify-between items-center gap-4">
+            <div class="flex items-center gap-3">
+                <div class="bg-white text-dbBlue p-3 rounded-2xl shadow-inner font-black text-2xl">
+                    <i class="fa-solid fa-book-open text-dbTeal"></i>
+                </div>
+                <div>
+                    <h1 class="text-2xl md:text-3xl font-display font-bold tracking-wide">Don Bosco Zesde Leerjaar</h1>
+                    <p class="text-xs md:text-sm text-blue-100 font-semibold opacity-90">Begrijpend Lezen & Informatieve Teksten Generator</p>
+                </div>
+            </div>
+            
+            <div class="bg-blue-950/60 p-1.5 rounded-xl flex gap-1 border border-blue-400/30">
+                <button id="btn-mode-digital" onclick="switchMode('digital')" class="px-4 py-2 rounded-lg font-bold text-sm transition-all duration-200 flex items-center gap-2 bg-dbTeal text-white shadow-sm">
+                    <i class="fa-solid fa-laptop text-white"></i> Digitaal Oefenen
+                </button>
+                <button id="btn-mode-print" onclick="switchMode('print')" class="px-4 py-2 rounded-lg font-bold text-sm transition-all duration-200 flex items-center gap-2 text-white hover:bg-white/10">
+                    <i class="fa-solid fa-print"></i> Werkblad Generator
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-grow max-w-7xl w-full mx-auto p-4 md:p-6">
+
+        <section class="bg-white rounded-2xl p-5 shadow-sm border border-slate-200/80 mb-6 no-print">
+            <h2 class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-4 flex items-center gap-2">
+                <i class="fa-solid fa-sliders text-dbTeal"></i> Instellingen voor Leestekst & Vragen
+            </h2>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <!-- Dropdown 1: Topic -->
+                <div>
+                    <label for="sel-topic" class="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1.5">
+                        <i class="fa-solid fa-newspaper text-dbBlue mr-1"></i> Onderwerp
+                    </label>
+                    <select id="sel-topic" onchange="updateTextAndQuestions()" class="w-full bg-slate-50 border-2 border-slate-200 focus:border-dbTeal focus:bg-white rounded-xl px-3 py-2.5 font-semibold text-slate-800 text-sm outline-none transition cursor-pointer">
+                        <option value="vulkanen">🌋 Vulkanen & Aardbevingen</option>
+                        <option value="ai_robots">🤖 Kunstmatige Intelligentie & Robots</option>
+                        <option value="menselijk_lichaam">🧠 Het Menselijk Lichaam</option>
+                        <option value="klimaat">🌍 Klimaatverandering & Natuur</option>
+                        <option value="egypte">🏺 Het Oude Egypte</option>
+                        <option value="oceaan">🐋 Oceaandieptes & Uniek Onderwaterleven</option>
+                        <option value="ruimtevaart">🚀 Ruimtevaart & De Reis naar Mars</option>
+                        <option value="social_media">📱 Sociale Media & Digitale Wereld</option>
+                    </select>
+                </div>
+
+                <!-- Dropdown 2: AVI Level -->
+                <div>
+                    <label for="sel-avi" class="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1.5">
+                        <i class="fa-solid fa-layer-group text-dbOrange mr-1"></i> AVI-niveau
+                    </label>
+                    <select id="sel-avi" onchange="updateTextAndQuestions()" class="w-full bg-slate-50 border-2 border-slate-200 focus:border-dbTeal focus:bg-white rounded-xl px-3 py-2.5 font-semibold text-slate-800 text-sm outline-none transition cursor-pointer">
+                        <option value="E6">AVI E6</option>
+                        <option value="M7" selected>AVI M7</option>
+                        <option value="E7">AVI E7</option>
+                        <option value="Plus">AVI Plus</option>
+                    </select>
+                </div>
+
+                <!-- Dropdown 3: Difficulty -->
+                <div>
+                    <label for="sel-difficulty" class="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1.5">
+                        <i class="fa-solid fa-brain text-purple-600 mr-1"></i> Moeilijkheidsgraad
+                    </label>
+                    <select id="sel-difficulty" onchange="updateTextAndQuestions()" class="w-full bg-slate-50 border-2 border-slate-200 focus:border-dbTeal focus:bg-white rounded-xl px-3 py-2.5 font-semibold text-slate-800 text-sm outline-none transition cursor-pointer">
+                        <option value="basis">Basis</option>
+                        <option value="gemiddeld" selected>Gemiddeld</option>
+                        <option value="moeilijk">Moeilijk</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Global Actions bar -->
+            <div class="flex flex-wrap items-center justify-between gap-3 pt-4 mt-4 border-t border-slate-100">
+                <div class="flex items-center gap-2 text-xs text-slate-500 font-semibold">
+                    <span id="text-meta-info" class="bg-slate-100 px-3 py-1.5 rounded-lg border border-slate-200">
+                        <!-- Dynamic metadata -->
+                    </span>
+                </div>
+
+                <div class="flex items-center gap-2">
+                    <button onclick="window.print()" class="bg-slate-900 hover:bg-slate-800 text-white font-bold py-2 px-4 rounded-xl transition shadow flex items-center gap-2 text-sm">
+                        <i class="fa-solid fa-print"></i> Afdrukken / PDF
+                    </button>
+                    <button id="btn-toggle-answers" onclick="toggleAnswers()" class="hidden bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2 px-4 rounded-xl transition shadow flex items-center gap-2 text-sm">
+                        <i class="fa-solid fa-key"></i> <span id="ans-btn-text">Correctiesleutel</span>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <section id="mode-digital-container" class="space-y-6">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                <!-- Text Container (Left) -->
+                <div class="lg:col-span-6 bg-white p-6 md:p-8 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center justify-between gap-2 border-b border-slate-100 pb-3 mb-4">
+                            <span id="digital-topic-tag" class="bg-dbTeal/10 text-dbTeal font-extrabold text-xs px-2.5 py-1 rounded-md uppercase tracking-wider">
+                                Informatieve Tekst
+                            </span>
+                            <span id="digital-avi-tag" class="bg-amber-100 text-amber-800 font-extrabold text-xs px-2.5 py-1 rounded-md">
+                                AVI M7
+                            </span>
+                        </div>
+                        <h2 id="digital-title" class="text-2xl font-display font-bold text-slate-900 mb-4">
+                            <!-- Title injected -->
+                        </h2>
+                        <div id="digital-text-body" class="font-serif text-slate-700 leading-relaxed space-y-4 text-base">
+                            <!-- Long text body injected -->
+                        </div>
+                    </div>
+                    <div class="mt-6 pt-4 border-t border-slate-100 text-xs text-slate-400 italic">
+                        💡 Tip: Lees de tekst grondig door en bekijk de tussentitels voor je de vragen beantwoordt.
+                    </div>
+                </div>
+
+                <!-- Questions Container (Right) -->
+                <div class="lg:col-span-6 bg-white p-6 md:p-8 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center justify-between border-b border-slate-100 pb-3 mb-4">
+                            <h3 class="font-display font-bold text-lg text-slate-900 flex items-center gap-2">
+                                <i class="fa-solid fa-pen-to-square text-dbOrange"></i> Vragen & Opdrachten
+                            </h3>
+                            <span id="digital-diff-tag" class="text-xs font-bold px-2.5 py-1 rounded-md bg-blue-50 text-dbBlue border border-blue-100">
+                                Gemiddeld
+                            </span>
+                        </div>
+
+                        <div id="digital-questions-list" class="space-y-4">
+                            <!-- Dynamic interactive questions -->
+                        </div>
+                    </div>
+
+                    <div class="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between gap-4">
+                        <button onclick="checkDigitalReadingAnswers()" class="w-full bg-dbTeal hover:bg-teal-700 text-white font-extrabold py-3 px-6 rounded-xl shadow transition active:scale-95 flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-circle-check"></i> Controleer Antwoorden
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="mode-print-container" class="hidden space-y-6">
+            
+            <div class="bg-amber-50 border border-amber-200 rounded-2xl p-4 no-print flex flex-col sm:flex-row justify-between items-center gap-4">
+                <div class="flex items-center gap-3">
+                    <div class="p-3 bg-dbTeal text-white rounded-xl">
+                        <i class="fa-solid fa-file-lines text-xl"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-slate-800">Printklaar A4-Werkblad Begrijpend Lezen</h3>
+                        <p class="text-xs text-slate-600">Inclusief gelinieerde schrijflijntjes voor potlood/pen en optionele sleutel.</p>
+                    </div>
+                </div>
+                <button onclick="window.print()" class="w-full sm:w-auto bg-slate-900 hover:bg-slate-800 text-white font-bold px-6 py-2.5 rounded-xl shadow transition flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-print"></i> Werkblad Afdrukken
+                </button>
+            </div>
+
+            <!-- Printable Worksheet Page -->
+            <div id="printable-worksheet" class="bg-white p-6 md:p-10 rounded-2xl shadow-md border border-slate-200 print-card">
+                
+                <!-- School Header -->
+                <div class="border-b-2 border-slate-800 pb-3 mb-4 flex justify-between items-end">
+                    <div>
+                        <span class="text-xs font-bold text-slate-500 uppercase tracking-widest block">Don Bosco Zesde Leerjaar — Nederlands Begrijpend Lezen</span>
+                        <h1 class="text-2xl font-display font-bold text-slate-900">Informatieve Tekst & Verwerkingsvragen</h1>
+                        <p id="print-subtitle-info" class="text-xs text-slate-600 mt-0.5">Onderwerp: Vulkanen | AVI: M7 | Niveau: Gemiddeld</p>
+                    </div>
+                    <div class="text-right text-xs space-y-1 font-medium">
+                        <div><strong>Naam:</strong> <span class="inline-block w-36 border-b border-slate-400"></span></div>
+                        <div><strong>Klas:</strong> <span class="inline-block w-36 border-b border-slate-400"></span></div>
+                        <div><strong>Datum:</strong> <span class="inline-block w-36 border-b border-slate-400"></span></div>
+                        <div><strong>Score:</strong> <span class="inline-block w-12 border-b border-slate-400"></span> / 10</div>
+                    </div>
+                </div>
+
+                <!-- Printable 2 Column Grid -->
+                <div class="grid grid-cols-1 md:grid-cols-12 gap-6">
+                    
+                    <!-- Text Box -->
+                    <div class="md:col-span-6 border-r border-slate-200 pr-4">
+                        <h2 id="print-text-title" class="text-lg font-display font-bold text-slate-900 mb-2">
+                            <!-- Print Title -->
+                        </h2>
+                        <div id="print-text-body" class="font-serif text-slate-800 leading-relaxed text-xs space-y-2.5 print-text-column">
+                            <!-- Print Text -->
+                        </div>
+                    </div>
+
+                    <!-- Questions Box with Writing Lines -->
+                    <div class="md:col-span-6 space-y-3">
+                        <h3 class="font-bold text-xs uppercase tracking-wider text-slate-500 border-b border-slate-200 pb-1 flex justify-between">
+                            <span>📝 Vragen & Opdrachten</span>
+                            <span class="text-[10px] text-slate-400 font-normal">🔍 = Letterlijk | 💡 = Interpretatie</span>
+                        </h3>
+                        <div id="print-questions-list" class="space-y-3.5 text-xs">
+                            <!-- Dynamic Print Questions with writing lines -->
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="mt-6 pt-3 border-t border-slate-300 flex justify-between items-center text-[10px] text-slate-500">
+                    <span>Don Bosco Zesde Leerjaar — Werkblad Begrijpend Lezen</span>
+                    <span>Pagina 1 / 1</span>
+                </div>
+            </div>
+
+            <!-- Printable Answer Key Page -->
+            <div id="printable-answer-key" class="hidden bg-white p-6 md:p-10 rounded-2xl shadow-md border border-slate-200 print-card page-break mt-8">
+                <div class="border-b-2 border-emerald-600 pb-3 mb-4 flex justify-between items-center">
+                    <div>
+                        <span class="text-xs font-bold text-emerald-600 uppercase tracking-widest block">Don Bosco Zesde Leerjaar</span>
+                        <h2 class="text-xl font-display font-bold text-slate-900">CORRECTIESLEUTEL — Begrijpend Lezen</h2>
+                        <p id="print-key-subtitle" class="text-xs text-slate-500">Modelantwoorden voor de leerkracht of zelfcorrectie</p>
+                    </div>
+                    <span class="bg-emerald-100 text-emerald-800 text-xs font-bold px-3 py-1 rounded-full">Sleutel</span>
+                </div>
+
+                <div id="print-answers-list" class="space-y-3 text-xs leading-relaxed">
+                    <!-- Dynamic Printable Answer Key -->
+                </div>
+            </div>
+
+        </section>
+
+    </main>
+
+    <script>
+        let currentMode = 'digital';
+        let answersVisible = false;
+
+        // EXTENDED LONG TEXTS DATABASE
+        const TEXT_DATABASE = {
+            vulkanen: {
+                topicName: "Vulkanen & Aardbevingen",
+                E6: {
+                    title: "De Vurige Kracht van Onze Aarde",
+                    text: [
+                        "<strong>Een rustige berg die plots ontwaakt</strong><br>Stel je een grote, groene berg voor waar vogels zingen en schapen grazen. Alles lijkt rustig. Maar diep onder het gras gebeurt er iets vreemds. De aarde begint zachtjes te trillen. Rieten pannen rammelen op de daken van de huizen in het dal. Dit is geen gewone berg, maar een slapende vulkaan die na honderden jaren wakker wordt.",
+                        "<strong>Het hete geheim onder de grond</strong><br>Onze aarde heeft een dunne, harde buitenkant die we de aardkorst noemen. Maar hoe dieper je onder de grond gaat, hoe heter het wordt. Tientallen kilometers onder onze voeten is de hitte zo extreem dat zelfs de allerhardste rotsen smelten tot een stroperige, rode vloeistof. Dit gesmolten gesteente noemen we magma.",
+                        "<strong>Druk op de ketel</strong><br>In de diepte verzamelt zich steeds meer magma in een grote ruimte, de magmakamer. Samen met de gesmolten rotsen zitten er enorm veel gassen opgesloten. Het lijkt op een spuitfles cola waar je heel hard mee hebt geschud. Zodra de druk te hoog wordt, zoekt het magma een weg naar boven via scheuren in de aardkorst. De vulkaan barst met een gigantische klap uit!",
+                        "<strong>Lava, as en verwoesting</strong><br>Zodra het hete magma uit de berg stroomt en de buitenlucht raakt, verandert de naam: we noemen het vanaf dan lava. Lava kan een temperatuur bereiken van meer dan 1000 graden Celsius! Het stroomt als een vurige rivier naar beneden en verbrandt alles wat het tegenkomt. Daarnaast worden er reusachtige wolken van zwarte as en giftige gassen kilometers hoog de lucht in geslingerd.",
+                        "<strong>Vulkanologen houden de wacht</strong><br>Omdat een vulkaanuitbarsting zo gevaarlijk is voor mens en dier, houden speciale wetenschappers — vulkanologen genoemd — de bergen dag en nacht in de gaten. Zij gebruiken hele gevoelige apparaten om kleine aardbevingen te meten en kijken of de berg een beetje opzwelt. Zo kunnen ze de mensen uit het dorp op tijd waarschuwen om te vluchten."
+                    ],
+                    questions: {
+                        basis: [
+                            { type: "🔍 LETTERLIJK", question: "Hoe noemen we gesmolten gesteente wanneer het nog diep onder de grond zit?", answer: "Magma.", literal: true },
+                            { type: "🔍 LETTERLIJK", question: "Welke temperatuur kan lava bereiken volgens alinea 4?", answer: "Lava kan een temperatuur bereiken van meer dan 1000 graden Celsius.", literal: true },
+                            { type: "🔍 LETTERLIJK", question: "Hoe heten de wetenschappers die vulkanen onderzoeken en in de gaten houden?", answer: "Vulkanologen.", literal: true },
+                            { type: "💡 INTERPRETATIE", question: "Waarom vergelijkt de auteur het opgesloten magma met een spuitfles cola waar mee geschud is?", answer: "Om uit te leggen dat de opgebouwde gasdruk zo hoog wordt dat het mengsel met enorme kracht naar buiten wil ontploffen.", literal: false },
+                            { type: "💡 INZICHT", question: "Waarom is het werk van vulkanologen van levensbelang voor mensen die bij een vulkaan wonen?", answer: "Doordat zij kleine trillingen en het opzwellen van de berg meten, kunnen zij mensen op tijd waarschuwen om te evacueren.", literal: false }
+                        ],
+                        gemiddeld: [
+                            { type: "🔍 LETTERLIJK", question: "Wat is het verschil in naam tussen gesmolten gesteente onder de grond en boven de grond?", answer: "Onder de grond heet het magma, boven de grond heet het lava.", literal: true },
+                            { type: "🔍 LETTERLIJK", question: "In welke ruimte onder de vulkaan verzamelt het magma en het gas zich?", answer: "In de magmakamer.", literal: true },
+                            { type: "🔍 LETTERLIJK", question: "Welke twee zaken vliegen naast lava nog meer de lucht in bij een uitbarsting?", answer: "Reusachtige wolken van zwarte as en giftige gassen.", literal: true },
+                            { type: "💡 INTERPRETATIE", question: "Wat veroorzaakt de kleine aardbevingen vlak voordat een slapende vulkaan ontwaakt?", answer: "Het stijgende magma en de gassen die zich onder hoge druk een weg banen door de aardkorst.", literal: false },
+                            { type: "📖 WOORDENSCHAT", question: "Wat betekent het woord 'aardkorst' in deze leestekst?", answer: "De dunne, harde buitenste laag van de aarde waar wij op wonen en lopen.", literal: false }
+                        ],
+                        moeilijk: [
+                            { type: "🔍 LETTERLIJK", question: "Aan welke twee signalen kunnen wetenschappers zien dat een vulkaan mogelijk gaat uitbarsten?", answer: "1. Ze meten kleine aardbevingen. 2. Ze zien of de berg een beetje opzwelt.", literal: true },
+                            { type: "💡 INZICHT", question: "Leg in je eigen woorden het hele proces uit van smelten van gesteente tot het ontstaan van lava.", answer: "Door de hitte diep onder de aardkorst smelt gesteente tot magma. Dit verzamelt zich met gassen in de magmakamer. Als de druk te hoog wordt, breekt het door de korst naar buiten en wordt het lava genoemd.", literal: false },
+                            { type: "📖 HOOFDGEDACHTE", question: "Formuleer de hoofdgedachte van deze tekst in maximaal twee volzinnen.", answer: "Vulkanen ontstaan door de extreem hoge hitte en druk onder de aardkorst, waar magma ontstaat en als gevaarlijke lava naar buiten barst, wat door vulkanologen nauwlettend wordt opgevolgd.", literal: false }
+                        ]
+                    }
+                },
+                M7: {
+                    title: "Slapende Reuzen van de Aarde: De Geologie van Vulkanisme",
+                    text: [
+                        "<strong>Een bewegende planeet</strong><br>Wanneer we op straat lopen, voelt de aarde onder onze voeten stevig en onbeweeglijk aan. Toch is dat schijn. Onze aardkorst is geen gesloten, starre bol, maar gelijkt op een gebroken eierschaal. De korst bestaat uit tientallen reusachtige puzzelstukken die we tektonische platen noemen. Deze platen drijven heel langzaam op de hete, vloeibare mantel daaronder. Ze bewegen niet sneller dan een paar centimeter per jaar — ongeveer even snel als je vingernagels groeien.",
+                        "<strong>De Ring van Vuur</strong><br>Waar deze gigantische platen tegen elkaar botsen, langs elkaar schuren of juist langzaam uit elkaar drijven, ontstaan de gevaarlijkste zones op aarde. Het bekendste voorbeeld hiervan is de 'Ring van Vuur'. Dit is een hoefijzervormig gebied rondom de Stille Oceaan waar meer dan 75 procent van alle actieve en slapende vulkanen ter wereld te vinden is. Hier schuift de oceanische plaat onder de continentale plaat, een proces dat we subductie noemen.",
+                        "<strong>Explosief versus effusief</strong><br>Niet elke vulkaan barst op dezelfde manier uit. Geologen maken een belangrijk onderscheid tussen effusieve en explosieve erupties. Bij een effusieve uitbarsting (zoals op Hawaï) is het magma dunvloeibaar. De gassen kunnen gemakkelijk ontsnappen, waardoor het lava in rustige, rode stroompjes gestaag de berg af glijdt. Bij explosieve vulkanen is het magma echter dik en taai. De gassen komen vast te zitten en de druk loopt totdat de hele top van de berg opblazen wordt.",
+                        "<strong>Pyroclastische stromen: het dodelijke gevaar</strong><br>De meeste mensen denken dat stromende lava het grootste gevaar vormt bij een uitbarsting. Toch is dat niet zo, want lava beweegt meestal langzaam genoeg om te voet te vluchten. Het echte gevaar schuilt in zogenaamde pyroclastische stromen. Dit zijn gashoudende lawines van gloeiend hete as, rotsblokken en giftige gassen die met snelheden van meer dan 300 kilometer per uur de helling afrazen. Niets of niemand kan hieraan ontkomen.",
+                        "<strong>Vruchtbare as en geothermische energie</strong><br>Ondanks alle verwoesting hebben vulkanen de mensheid ook veel te bieden. De as die over het land wordt gesproeid, bevat waardevolle mineralen zoals kalium en fosferen. Hierdoor is de grond rondom vulkanen uitzonderlijk vruchtbaar voor landbouw. Daarnaast gebruiken landen zoals IJsland geothermische energie: ze pompen het door de aarde verwarmde grondwater op om huizen en steden milieuvriendelijk te verwarmen."
+                    ],
+                    questions: {
+                        gemiddeld: [
+                            { type: "🔍 LETTERLIJK", question: "Wat zijn tektonische platen volgens alinea 1?", answer: "De reusachtige puzzelstukken waaruit de aardkorst bestaat en die drijven op de hete mantel.", literal: true },
+                            { type: "🔍 LETTERLIJK", question: "Hoe heet het hoefijzervormige gebied rond de Stille Oceaan met de meeste vulkanen?", answer: "De Ring van Vuur.", literal: true },
+                            { type: "🔍 LETTERLIJK", question: "Wat is het belangrijkste verschil tussen een effusieve en een explosieve uitbarsting?", answer: "Bij effusief is het magma dunvloeibaar en stroomt het rustig; bij explosief is het magma dik en taai waardoor gassen de berg doen ontploffen.", literal: true },
+                            { type: "🔍 LETTERLIJK", question: "Hoe snel kunnen pyroclastische stromen de berghelling afrazen?", answer: "Met snelheden van meer dan 300 kilometer per uur.", literal: true },
+                            { type: "💡 INTERPRETATIE", question: "Waarom is de vergelijking met 'groeiende vingernagels' gebruikt in alinea 1?", answer: "Om aan te tonen hoe onvoorstelbaar langzaam de tektonische platen over de aarde bewegen.", literal: false },
+                            { type: "💡 INZICHT", question: "Waarom blijven mensen ondanks het levensgevaar toch vlak bij actieve vulkanen wonen?", answer: "Omdat de vulkanische as de bodem extreem vruchtbaar maakt voor landbouw en gewassen.", literal: false }
+                        ]
+                    }
+                },
+                E7: {
+                    title: "De Kracht van de Aarde: Seismologie, Tsunami's en Vulkanische Erupties",
+                    text: [
+                        "<strong>Als de aardkorst schokt</strong><br>Aardbevingen en vulkaanuitbarstingen zijn nauw met elkaar verbonden geologische verschijnselen. Wanneer tektonische platen langs elkaar schuiven, verloopt dat zelden soepel. De ruwe rotswanden haken in elkaar vast, waardoor er reusachtige spanningen in het gesteente opbouwen. Wanneer de druk ten slotte te groot wordt, schiet het gesteente met een schok los. De energie die hierbij in een fractie van een seconde vrijkomt, verplaatst zich als seismische golven door de aarde. Op het oppervlak voelen wij dit als een aardbeving.",
+                        "<strong>Het meten van trillingen</strong><br>Wetenschappers die aardbevingen bestuderen, noemen we seismologen. Zij maken gebruik van een seismograaf, een uiterst gevoelig meetinstrument dat elke trilling in de bodem registreert op een grafiek. Vroeger werd de sterkte van een aardbeving uitgedrukt op de bekende Schaal van Richter. Tegenwoordig gebruiken wetenschappers de MNS-schaal (Momentmagnitudeschaal). Elke stap op deze schaal betekent dat er ongeveer 32 keer zoveel energie vrijkomt!",
+                        "<strong>Het monster uit de oceaan: tsunami's</strong><br>Wanneer een zware aardbeving plaatsvindt onder de zeebodem, kan de zeebodem plotseling tientallen meters omhoog of omlaag worden geduwd. Dit verplaatst een gigantische kolom water. Op open zee merkt een schip hier nauwelijks iets van, maar zodra deze watergolf de ondiepe kust nadert, remt de onderkant af en wordt de golf opgestuwd tot een vernietigende muur van water van tientallen meters hoog: een tsunami.",
+                        "<strong>Klimaatontregeling door supervulkanen</strong><br>Naast lokale verwoestingen kunnen zware vulkanische erupties zelfs het wereldwijde klimaat voor meerdere jaren ontregelen. Bij een megauitbarsting worden miljoenen tonnen zwaveldioxide en fijn stof tot diep in de stratosfeer geblazen. Deze deeltjes vormen een soort sluier die het zonlicht terug de ruimte in kaatst. Hierdoor dalen de wereldwijde temperaturen, met misoogsten en hongersnood tot gevolg, zoals gebeurde na de uitbarsting van de Tambora in 1815."
+                    ],
+                    questions: {
+                        gemiddeld: [
+                            { type: "🔍 LETTERLIJK", question: "Wat veroorzaakt de opbouw van spanningen tussen tektonische platen volgens alinea 1?", answer: "De ruwe rotswanden van de platen haken in elkaar vast tijdens het langslopen.", literal: true },
+                            { type: "🔍 LETTERLIJK", question: "Welk apparaat gebruiken seismologen om trillingen in de bodem te registreren?", answer: "Een seismograaf.", literal: true },
+                            { type: "🔍 LETTERLIJK", question: "Wat gebeurt er onder water waardoor een tsunami ontstaat?", answer: "Een aardbeving onder de zeebodem duwt de zeebodem omhoog of omlaag, wat een gigantische kolom water verplaatst.", literal: true },
+                            { type: "💡 INTERPRETATIE", question: "Hoe kan een vulkaanuitbarsting in Azië leiden tot een misoogst in Europa?", answer: "Doordat stof en zwaveldioxide in de stratosfeer het zonlicht wereldwijd blokkeren, waardoor de temperatuur daalt.", literal: false }
+                        ]
+                    }
+                },
+                Plus: {
+                    title: "Geodynamica van Vulkanische Systemen en Atmosferische Impact",
+                    text: [
+                        "<strong>Magmatische differentiatie en viscositeit</strong><br>Het mechanisme achter vulkanische activiteit wordt fundamenteel bepaald door de chemische samenstelling en viscositeit (stroperigheid) van het magma in de asthenosfeer. Magma met een hoog silicagehalte (zoals rhyoliet) is extreem viskeus. Gasbellen kunnen hierin moeilijk uitzetten, wat leidt tot een katastrofale opbouw van de druk in de vulkanische leiding. Dit resulteert onvermijdelijk in Plinische erupties, gekenmerkt door een kilometerhoge eruptiekolom.",
+                        "<strong>De Yellowstone-caldera en het supervulcanisme</strong><br>Een van de meest bestudeerde geologische structuren ter wereld is de Yellowstone-caldera in de Verenigde Staten. Dit is een zogenaamde 'hotspot'-supervulkaan. In plaats van een klassieke kegelberg bestaat Yellowstone uit een reusachtige ingevallen krater van 55 bij 72 kilometer. Een toekomstige supereruptie zou meer dan 1000 kubieke kilometer tefra uitstoten, wat een vulkanische winter veroorzaakt en het wereldwijde ecosysteem drastisch zou ontrichten.",
+                        "<strong>Satelliettechnologie en magma-monitoring</strong><br>Moderne vulkanologie vertrouwt niet enkel meer op seismogrammen aan de voet van de berg. Met Synthetic Aperture Radar (InSAR) via satellieten kunnen geologen millimeterkleine vervormingen van het aardoppervlak vanuit de ruimte in kaart brengen. Gecombineerd met gasspectrometrie (meting van de verhouding SO2/CO2) kunnen wetenschappers de stijgsnelheid van de magmakolom met ongekende precisie modelleren."
+                    ],
+                    questions: {
+                        gemiddeld: [
+                            { type: "🔍 LETTERLIJK", question: "Welke chemische stof bepaalt voornamelijk de viscositeit van magma?", answer: "Silica (silicagehalte).", literal: true },
+                            { type: "🔍 LETTERLIJK", question: "Wat zijn de afmetingen van de krater van de Yellowstone-supervulkaan?", answer: "55 bij 72 kilometer.", literal: true },
+                            { type: "🔍 LETTERLIJK", question: "Welke geavanceerde satelliet-technologie wordt gebruikt om oppervlaktevervormingen te meten?", answer: "Synthetic Aperture Radar (InSAR).", literal: true },
+                            { type: "💡 INTERPRETATIE", question: "Leg uit waarom viskeus magma leidt tot explosievere uitbarstingen dan vloeibaar magma.", answer: "Omdat gassen niet gemakkelijk kunnen ontsnappen uit stroperig magma, waardoor de druk blijft opbouwen tot een explosie.", literal: false }
+                        ]
+                    }
+                }
+            },
+            ai_robots: {
+                topicName: "Kunstmatige Intelligentie & Robots",
+                M7: {
+                    title: "De Wereld van AI: Slimme Algoritmes en Zelflerende Robots",
+                    text: [
+                        "<strong>Wat is Kunstmatige Intelligentie?</strong><br>Als je aan een slimme computer denkt, denk je misschien aan een pratende robot uit een sciencefictionfilm. Maar Kunstmatige Intelligentie (in het Engels: Artificial Intelligence of kortweg AI) is al op heel veel plekken in ons dagelijks leven aanwezig. Denk maar aan de spraakassistent op de smartphone, de slimme zoekmachine van Google of de aanbevelingen die je krijgt op YouTube en Netflix.",
+                        "<strong>Hoe leert een computer?</strong><br>Vroeger moesten computerprogrammeurs elk regeltje code zelf typen. Als ze een computer wilden leren wat een kat was, moesten ze regels schrijven zoals: 'een kat heeft twee oren, vier poten en een staart'. Maar een computer raakte snel in de war als de kat op de foto achter een boom zat. Tegenwoordig werkt AI via 'machinaal leren'. De computer krijgt miljoenen foto's van katten te zien. Het systeem zoekt zelf naar patronen en leert zo helemaal zelfstandig hoe een kat eruitziet.",
+                        "<strong>Generatieve AI en slimme robotica</strong><br>Sinds kort bestaat er ook 'generatieve AI'. Dit zijn programma's die zelf nieuwe dingen kunnen maken, zoals opstellen schrijven, muziek componeren of realistische kunstwerken tekenen binnen enkele seconden! Wanneer we deze slimme software combineren met metalen robots, krijgen we machines die zelfstandig pakketjes kunnen sorteren in magazijnen, chirurgische operaties uitvoeren in ziekenhuizen of de oceaanbodem verkennen.",
+                        "<strong>Ethische vragen en de toekomst</strong><br>Hoewel AI ons leven op heel veel manieren makkelijker en sneller maakt, stellen wetenschappers en filosofen zich ook belangrijke vragen. Wie is er verantwoordelijk als een zelfrijdende auto een ongeluk maakt? En wat gebeurt er met de banen van mensen als robots al het werk overnemen? Daarom wordt er wereldwijd gewerkt aan strengere wetten zodat AI altijd veilig en eerlijk gebruikt blijft worden."
+                    ],
+                    questions: {
+                        gemiddeld: [
+                            { type: "🔍 LETTERLIJK", question: "Waar staat de Engelse afkorting 'AI' precies voor?", answer: "Artificial Intelligence.", literal: true },
+                            { type: "🔍 LETTERLIJK", question: "Hoe leerden programmeurs vroeger een computer een kat herkennen, vergeleken met machinaal leren?", answer: "Vroeger typten ze alle regeltjes uit; bij machinaal leren kijkt de computer naar miljoenen foto's en leert zelf de patronen.", literal: true },
+                            { type: "🔍 LETTERLIJK", question: "Noem twee taken die generatieve AI kan uitvoeren volgens alinea 3.", answer: "Opstellen schrijven, muziek componeren of kunstwerken tekenen.", literal: true },
+                            { type: "💡 INTERPRETATIE", question: "Waarom is het belangrijk dat er wereldwijd wetten komen voor het gebruik van AI?", answer: "Om te zorgen dat slimme computers veilig en eerlijk gebruikt worden en geen gevaar vormen voor menselijke banen of veiligheid.", literal: false },
+                            { type: "📖 WOORDENSCHAT", question: "Wat betekent het woord 'algoritme' in de context van deze leestekst?", answer: "Een reeks van stappen en regels die een computer volgt om een probleem op te lossen of een taak uit te voeren.", literal: false }
+                        ]
+                    }
+                }
+            },
+            ruimtevaart: {
+                topicName: "Ruimtevaart & De Reis naar Mars",
+                M7: {
+                    title: "De Avontuurlijke Missie naar de Rode Planeet Mars",
+                    text: [
+                        "<strong>Onze geheimzinnige buurplaneet</strong><br>Als je op een heldere nacht naar de sterrenhemel kijkt, kun je soms een fel oranjerood puntje zien blinken. Dat is Mars, de vierde planeet vanaf de zon. Mars wordt ook wel de 'Rode Planeet' genoemd. Die opvallende kleur komt door het roestige ijzerstof dat over de hele planeet verspreid ligt. Mars is een koude, droge woestijnwereld waar het gemiddeld min 60 graden Celsius is.",
+                        "<strong>Robotverkenners op het marsoppervlak</strong><br>Omdat de reis naar Mars extreem gevaarlijk is, hebben ruimtevaartorganisaties zoals NASA en ESA nog geen mensen gestuurd, maar wel slimme robotkarretjes, zogenaamde rovers. De bekendste rover is Perseverance, die in februari 2021 landde in de Jezero-krater. Deze slimme robot rijdt zelfstandig rond, boort gaten in rotsen en zoekt naar fossiele sporen van microscopisch leven dat miljarden jaren geleden mogelijk in het water van de krater leefde.",
+                        "<strong>De zware reis van de astronauten</strong><br>In de toekomst willen ruimtevaartorganisaties ook echte astronauten naar Mars sturen. Maar zo'n reis is een gigantische uitdaging. De afstand tussen de aarde en Mars verandert voortdurend, maar een enkele reis duurt gemiddeld maar liefst zeven maanden! Midden in de ruimte hebben astronauten geen bescherming van de dampkring tegen dodelijke kosmische straling. Bovendien moeten ze al hun eten, drinken en zuurstof voor meer dan twee jaar meenemen.",
+                        "<strong>Wonen in een Marsbasis</strong><br>Eenmaal aangekomen op Mars kunnen astronauten niet zomaar naar buiten wandelen. De luchtdruk is er piepklein en de lucht bestaat bijna volledig uit giftige koolstofdioxide. Astronauten zullen speciale ruimtepakken moeten dragen en wonen in ondergrondse of afgeschermde koepels. Wetenschappers onderzoeken nu zelfs hoe we van het ijs op Mars drinkwater en raketbrandstof kunnen maken!"
+                    ],
+                    questions: {
+                        gemiddeld: [
+                            { type: "🔍 LETTERLIJK", question: "Waar komt de rode kleur van de planeet Mars vandaan?", answer: "Van het roestige ijzerstof dat over de hele planeet ligt.", literal: true },
+                            { type: "🔍 LETTERLIJK", question: "In welk jaar landde de rover Perseverance op Mars en in welke krater?", answer: "In februari 2021 in de Jezero-krater.", literal: true },
+                            { type: "🔍 LETTERLIJK", question: "Hoe lang duurt een enkele reis van de aarde naar Mars gemiddeld?", answer: "Gemiddeld zeven maanden.", literal: true },
+                            { type: "💡 INTERPRETATIE", question: "Waarom is de Jezero-krater specifiek gekozen als landingsplek voor de Perseverance?", answer: "Omdat hier vroeger heel waarschijnlijk een meer stroomde, wat de beste kans geeft om sporen van oud microscopisch leven te vinden.", literal: false },
+                            { type: "💡 INZICHT", question: "Noem drie grote menselijke gevaren of problemen bij een reis naar Mars.", answer: "Kies uit: 7 maanden opgesloten zitten, dodelijke kosmische straling, gebrek aan zuurstof/luchtdruk op Mars.", literal: false }
+                        ]
+                    }
+                }
+            }
+        };
+
+        function getFallbackTextData(topicKey, avi) {
+            const topicObj = TEXT_DATABASE[topicKey] || TEXT_DATABASE['vulkanen'];
+            const aviLabel = avi === 'Plus' ? 'AVI Plus' : `AVI ${avi}`;
+            
+            return {
+                title: `Informatief Dossier: ${topicObj.topicName}`,
+                text: [
+                    `<strong>1. Inleiding tot het onderwerp</strong><br>Het thema ${topicObj.topicName.toLowerCase()} is een van de meest fascinerende onderwerpen binnen het leerplan natuur en techniek. Wetenschappers doen al tientallen jaren onderzoek om alle geheimen hiervan te ontrafelen. In dit informatieve dossier op niveau ${aviLabel} bekijken we de belangrijkste kenmerken en ontwikkelingen.`,
+                    `<strong>2. Belangrijke processen en achtergronden</strong><br>Om te begrijpen hoe dit precies werkt, moeten we kijken naar de onderliggende oorzaken. Verschillende factoren spelen hierbij een rol. Zowel de natuurlijke omgeving als technologische invloeden hebben een directe impact op het verloop. Wetenschappelijk onderzoek toont aan dat er duidelijke patronen herkenbaar zijn.`,
+                    `<strong>3. Toepassingen en gevolgen voor de maatschappij</strong><br>In het dagelijks leven merken we steeds meer van de gevolgen van dit verscheidene fenomeen. Het biedt enerzijds enorme kansen en voordelen voor de mensheid, maar brengt anderzijds ook maatschappelijke en ecologische uitdagingen met zich mee waar we verstandig mee moeten omgaan.`,
+                    `<strong>4. Toekomstperspectief en besluit</strong><br>Experts verwachten dat er de komende decennia nog veel zal veranderen op dit vlak. Door voortdurende innovatie, betere meetmethoden en internationaal overleg leren we steeds beter hoe we deze kennis moeten toepassen in de wereld van morgen.`
+                ],
+                questions: {
+                    gemiddeld: [
+                        { type: "🔍 LETTERLIJK", question: `Wat is volgens alinea 1 het hoofddoel van het onderzoek naar ${topicObj.topicName.toLowerCase()}?`, answer: "Het ontrafelen van de geheimen en kenmerken binnen natuur en techniek.", literal: true },
+                        { type: "🔍 LETTERLIJK", question: "Welke twee invloeden hebben volgens alinea 2 een directe impact op het verloop?", answer: "Natuurlijke omgevingsfactoren en technologische invloeden.", literal: true },
+                        { type: "💡 INTERPRETATIE", question: "Waarom noemt de auteur in alinea 3 zowel voordelen als uitdagingen?", answer: "Om te laten zien dat het onderwerp complex is en niet alleen maar positief of negatief bekeken kan worden.", literal: false },
+                        { type: "💡 INZICHT", question: "Wat is er volgens de slotalinea nodig om de kennis in de toekomst goed toe te passen?", answer: "Voortdurende innovatie, betere meetmethoden en internationale samenwerking.", literal: false },
+                        { type: "📖 HOOFDGEDACHTE", question: "Formuleer in één volzin de hoofdgedachte van dit dossier.", answer: "Een overzicht van de achtergronden, maatschappelijke impact en toekomstkansen van dit onderwerp.", literal: false }
+                    ]
+                }
+            };
+        }
+
+        function updateTextAndQuestions() {
+            const topicKey = document.getElementById('sel-topic').value;
+            const avi = document.getElementById('sel-avi').value;
+            const diff = document.getElementById('sel-difficulty').value;
+
+            const topicObj = TEXT_DATABASE[topicKey] || TEXT_DATABASE['vulkanen'];
+            let textData = topicObj[avi] || topicObj['M7'] || topicObj['E6'];
+            
+            if (!textData) {
+                textData = getFallbackTextData(topicKey, avi);
+            }
+
+            // Questions extraction
+            let questions = [];
+            if (textData.questions && textData.questions[diff]) {
+                questions = textData.questions[diff];
+            } else if (textData.questions && textData.questions['gemiddeld']) {
+                questions = textData.questions['gemiddeld'];
+            } else {
+                questions = getFallbackTextData(topicKey, avi).questions.gemiddeld;
+            }
+
+            const aviLabel = avi === 'Plus' ? 'AVI Plus' : `AVI ${avi}`;
+            const diffLabels = { basis: 'Basis', gemiddeld: 'Gemiddeld', moeilijk: 'Moeilijk' };
+
+            // Update Metadata tag
+            const metaTag = document.getElementById('text-meta-info');
+            metaTag.innerHTML = `<strong>Onderwerp:</strong> ${topicObj.topicName} | <strong>AVI:</strong> ${aviLabel} | <strong>Niveau:</strong> ${diffLabels[diff]}`;
+
+            // Render Digital Mode
+            document.getElementById('digital-topic-tag').textContent = topicObj.topicName;
+            document.getElementById('digital-avi-tag').textContent = aviLabel;
+            document.getElementById('digital-diff-tag').textContent = diffLabels[diff];
+            document.getElementById('digital-title').textContent = textData.title;
+
+            const digitalBody = document.getElementById('digital-text-body');
+            digitalBody.innerHTML = textData.text.map(p => `<div class="leading-relaxed">${p}</div>`).join('');
+
+            const digitalQList = document.getElementById('digital-questions-list');
+            digitalQList.innerHTML = '';
+
+            questions.forEach((q, idx) => {
+                const isLiteral = q.literal !== false;
+                const badgeColor = isLiteral ? "bg-blue-600 text-white" : "bg-purple-600 text-white";
+                
+                const item = document.createElement('div');
+                item.className = "bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-2";
+                item.innerHTML = `
+                    <div class="flex items-center justify-between">
+                        <span class="${badgeColor} font-extrabold text-[10px] px-2 py-0.5 rounded uppercase tracking-wider">${q.type}</span>
+                        <span class="text-xs font-bold text-slate-400">Vraag ${idx + 1}</span>
+                    </div>
+                    <p class="font-bold text-slate-800 text-sm">${q.question}</p>
+                    <textarea id="digital-ans-${idx}" rows="2" class="w-full bg-white border border-slate-300 rounded-lg p-2.5 text-xs text-slate-800 focus:border-dbTeal focus:ring-1 focus:ring-dbTeal outline-none transition resize-none" placeholder="Typ hier jouw antwoord..."></textarea>
+                    <div id="digital-feedback-${idx}" class="hidden text-xs bg-emerald-50 text-emerald-900 border border-emerald-200 p-2.5 rounded-lg mt-2 space-y-1">
+                        <div class="font-bold text-emerald-800 flex items-center gap-1">
+                            <i class="fa-solid fa-circle-check"></i> Modelantwoord (${isLiteral ? 'Letterlijk uit tekst' : 'Interpretatie/Inzicht'}):
+                        </div>
+                        <p>${q.answer}</p>
+                    </div>
+                `;
+                digitalQList.appendChild(item);
+            });
+
+            // Render Print Mode
+            document.getElementById('print-subtitle-info').textContent = `Onderwerp: ${topicObj.topicName} | AVI: ${aviLabel} | Niveau: ${diffLabels[diff]}`;
+            document.getElementById('print-text-title').textContent = textData.title;
+            
+            const printBody = document.getElementById('print-text-body');
+            printBody.innerHTML = textData.text.map(p => `<div class="text-justify mb-2">${p}</div>`).join('');
+
+            const printQList = document.getElementById('print-questions-list');
+            const printAList = document.getElementById('print-answers-list');
+            printQList.innerHTML = '';
+            printAList.innerHTML = '';
+
+            questions.forEach((q, idx) => {
+                const isLiteral = q.literal !== false;
+                
+                // Question item with notebook writing lines for pencil/pen
+                const qDiv = document.createElement('div');
+                qDiv.className = "space-y-1 pb-1.5 border-b border-slate-100";
+                qDiv.innerHTML = `
+                    <p class="font-bold text-slate-900 text-xs leading-snug">
+                        <span class="inline-block ${isLiteral ? 'bg-blue-100 text-blue-900' : 'bg-purple-100 text-purple-900'} px-1.5 py-0.5 rounded text-[9px] font-extrabold mr-1">${q.type}</span>
+                        ${idx + 1}. ${q.question}
+                    </p>
+                    <div class="pt-0.5 space-y-0.5">
+                        <div class="writing-line"></div>
+                        <div class="writing-line"></div>
+                        <div class="writing-line"></div>
+                    </div>
+                `;
+                printQList.appendChild(qDiv);
+
+                // Printable Answer Key Item
+                const aDiv = document.createElement('div');
+                aDiv.className = "bg-slate-50 p-2.5 rounded-lg border border-slate-200 space-y-1";
+                aDiv.innerHTML = `
+                    <div class="font-bold text-slate-800 text-xs flex items-center justify-between">
+                        <span><strong class="text-emerald-700">Vraag ${idx + 1}:</strong> ${q.question}</span>
+                        <span class="text-[9px] px-2 py-0.5 rounded ${isLiteral ? 'bg-blue-100 text-blue-800' : 'bg-purple-100 text-purple-800'} font-bold">${isLiteral ? 'LETTERLIJK' : 'INTERPRETATIE'}</span>
+                    </div>
+                    <div class="text-emerald-900 font-medium text-xs bg-emerald-50/80 p-2 rounded border border-emerald-200 mt-1">
+                        <strong>Modelantwoord:</strong> ${q.answer}
+                    </div>
+                `;
+                printAList.appendChild(aDiv);
+            });
+        }
+
+        function checkDigitalReadingAnswers() {
+            const topicKey = document.getElementById('sel-topic').value;
+            const avi = document.getElementById('sel-avi').value;
+            const diff = document.getElementById('sel-difficulty').value;
+            
+            const topicObj = TEXT_DATABASE[topicKey] || TEXT_DATABASE['vulkanen'];
+            let textData = topicObj[avi] || topicObj['M7'] || topicObj['E6'];
+            
+            if (!textData) textData = getFallbackTextData(topicKey, avi);
+
+            let questions = [];
+            if (textData.questions && textData.questions[diff]) {
+                questions = textData.questions[diff];
+            } else if (textData.questions && textData.questions['gemiddeld']) {
+                questions = textData.questions['gemiddeld'];
+            } else {
+                questions = getFallbackTextData(topicKey, avi).questions.gemiddeld;
+            }
+
+            questions.forEach((_, idx) => {
+                const fb = document.getElementById(`digital-feedback-${idx}`);
+                if (fb) fb.classList.remove('hidden');
+            });
+        }
+
+        function switchMode(mode) {
+            currentMode = mode;
+            const digitalBtn = document.getElementById('btn-mode-digital');
+            const printBtn = document.getElementById('btn-mode-print');
+            const digitalContainer = document.getElementById('mode-digital-container');
+            const printContainer = document.getElementById('mode-print-container');
+            const ansBtn = document.getElementById('btn-toggle-answers');
+
+            if (mode === 'digital') {
+                digitalBtn.className = "px-4 py-2 rounded-lg font-bold text-sm transition-all duration-200 flex items-center gap-2 bg-dbTeal text-white shadow-sm";
+                printBtn.className = "px-4 py-2 rounded-lg font-bold text-sm transition-all duration-200 flex items-center gap-2 text-white hover:bg-white/10";
+                digitalContainer.classList.remove('hidden');
+                printContainer.classList.add('hidden');
+                ansBtn.classList.add('hidden');
+            } else {
+                printBtn.className = "px-4 py-2 rounded-lg font-bold text-sm transition-all duration-200 flex items-center gap-2 bg-dbTeal text-white shadow-sm";
+                digitalBtn.className = "px-4 py-2 rounded-lg font-bold text-sm transition-all duration-200 flex items-center gap-2 text-white hover:bg-white/10";
+                printContainer.classList.remove('hidden');
+                digitalContainer.classList.add('hidden');
+                ansBtn.classList.remove('hidden');
+            }
+        }
+
+        function toggleAnswers() {
+            answersVisible = !answersVisible;
+            const answerKeyDiv = document.getElementById('printable-answer-key');
+            const btnText = document.getElementById('ans-btn-text');
+
+            if (answersVisible) {
+                answerKeyDiv.classList.remove('hidden');
+                btnText.textContent = "Sleutel Verbergen";
+            } else {
+                answerKeyDiv.classList.add('hidden');
+                btnText.textContent = "Correctiesleutel";
+            }
+        }
+
+        window.onload = function() {
+            updateTextAndQuestions();
+        };
+    </script>
+</body>
+</html>
